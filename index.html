@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>화성 우주복 분석 미션</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu&display=swap">
+<style>
+/*
+VOICE: 게임형 탐사 미션 — 긴장감 있는 우주 관제실, 친근한 말투
+IDEA: 화성 착륙 전 '우주복 점검 관제 콘솔'과 '화성 탐사 스캐너'
+PICTURE: 직접 만지는 우주복 해부도, 소재 단면 방어 실험, 화성 지표 스캐너, 환경 실험 챔버
+COLOUR and TYPE: 깊은 우주 남색 바탕, 화성 녹슨 주황이 주색, 시안·노랑 강조 / 글꼴 a시네마(대체 Gaegu), 굵기 없이 색으로 강조
+LAYOUT: 상단 관제 바(로고·이메일 우측), 단계 진행 표시줄, 한 화면 한 미션, 좁은 화면에선 세로로 쌓기
+*/
+:root{color-scheme:dark;--bg:#0b1026;--panel:#141b3d;--panel2:#1b2350;--line:#2c3770;--ink:#eef1ff;--dim:#aab3dc;--mars:#d9622b;--or:#ff8a3d;--cy:#5fd4ff;--ye:#ffd166;--gr:#6be39b;--rd:#ff6b7a;--pu:#b9a3ff}
+:root[data-theme=light]{color-scheme:dark}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0;font-weight:400 !important}
+html{scroll-padding-top:120px}
+body{margin:0;background:radial-gradient(1200px 600px at 80% -10%,#3a1d2a 0,transparent 60%),radial-gradient(900px 500px at 0% 110%,#132a55 0,transparent 60%),var(--bg);color:var(--ink);font:18px/1.6 'a시네마L','a시네마','a시네마M','Gaegu',sans-serif;overflow-x:clip;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(1px 1px at 20% 30%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 70% 20%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 40% 80%,#fff5 50%,transparent 51%),radial-gradient(1px 1px at 90% 60%,#fff7 50%,transparent 51%),radial-gradient(1px 1px at 10% 70%,#fff5 50%,transparent 51%);background-size:400px 400px;opacity:.7;z-index:-1}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;line-height:1.15;font-weight:400}
+.c-o{color:var(--or)}.c-c{color:var(--cy)}.c-y{color:var(--ye)}.c-g{color:var(--gr)}.c-r{color:var(--rd)}.c-p{color:var(--pu)}.dim{color:var(--dim)}
+header.top{position:sticky;top:0;z-index:20;background:#0b1026e8;backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:8px max(3vw,12px);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.ttl{flex:1 1 260px}
+.ttl h1{font-size:clamp(22px,3vw,30px)}
+.ttl h1 span{color:var(--or)}
+.ttl small{color:var(--dim);font-size:14px}
+.hud{display:flex;gap:10px;align-items:center;font-size:15px;color:var(--dim)}
+.hud .xp{color:var(--ye);font-size:18px}
+.brand{display:flex;align-items:center;gap:8px;margin-left:auto}
+.brand img{width:52px;height:52px;border-radius:50%;background:#fff;padding:2px}
+.brand div{font-size:13px;line-height:1.25;color:var(--dim)}
+.brand div span{color:var(--cy);font-size:15px}
+nav.steps{display:flex;gap:6px;padding:10px max(3vw,12px);overflow-x:auto;border-bottom:1px solid var(--line);background:#0d1330}
+nav.steps div{flex:none;padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:14px;color:var(--dim);white-space:nowrap}
+nav.steps div.on{border-color:var(--or);color:var(--or);background:#ff8a3d1a}
+nav.steps div.ok{border-color:#6be39b66;color:var(--gr)}
+main{max-width:1240px;margin:0 auto;padding:clamp(16px,3vw,36px) max(3vw,12px) 80px}
+section.scr{display:none;animation:fade .35s ease}
+section.scr.show{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.mhead{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 20px;margin-bottom:16px}
+.mhead h2{font-size:clamp(28px,4vw,42px)}
+.tag{display:inline-block;padding:3px 12px;border-radius:8px;background:#ff8a3d22;color:var(--or);font-size:15px}
+.tag.c{background:#5fd4ff22;color:var(--cy)}
+.brief{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cy);border-radius:12px;padding:12px 16px;margin-bottom:18px;color:var(--dim)}
+.brief em{font-style:normal;color:var(--ye)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.btn{min-height:46px;padding:8px 20px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;transition:.15s;font-size:18px}
+.btn:hover:not(:disabled){border-color:var(--cy);color:var(--cy)}
+.btn:focus-visible,.opt:focus-visible,.fcard:focus-visible,.lay:focus-visible,.chk:focus-visible{outline:3px solid var(--ye);outline-offset:2px}
+.btn.go{background:linear-gradient(135deg,#ff8a3d,#d9622b);border:0;color:#1a0b05}
+.btn.go:hover:not(:disabled){filter:brightness(1.1);color:#1a0b05}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.next{display:none;margin-top:20px}
+.next.show{display:inline-flex;align-items:center;gap:8px;animation:fade .3s}
+.q{font-size:20px;margin-bottom:10px}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;padding:10px 14px;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:17px;line-height:1.45}
+.opt:hover:not(:disabled){border-color:var(--cy)}
+.opt.ok{border-color:var(--gr);background:#6be39b22;color:var(--gr)}
+.opt.no{border-color:var(--rd);background:#ff6b7a1a;color:#ffb3bb}
+.opt:disabled{cursor:default}
+.fb{margin-top:10px;min-height:1em;font-size:17px;color:var(--dim)}
+/* suit */
+.suitbox{position:relative;background:radial-gradient(circle at 50% 40%,#22306a,#10163a 70%);border-radius:16px;border:1px solid var(--line)}
+#suit{width:100%;max-height:560px;display:block}
+.hs{cursor:pointer}
+.hs circle{fill:#ff8a3d;stroke:#fff;stroke-width:2;transition:.2s}
+.hs:hover circle{fill:#ffd166}
+.hs.done circle{fill:#6be39b}
+.hs text{fill:#1a0b05;font-size:15px;text-anchor:middle;dominant-baseline:central;pointer-events:none;font-family:inherit}
+.hs.pulse circle{animation:pl 1.2s infinite}
+@keyframes pl{50%{r:17}}
+.legend{display:grid;gap:6px;margin:12px 0}
+.legend div{display:flex;gap:10px;align-items:baseline;padding:6px 10px;border-radius:10px;background:#0f1533;font-size:16px}
+.legend b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--or);color:#1a0b05;display:grid;place-items:center;font-size:15px}
+.legend .m{color:var(--gr);font-size:15px}
+.fcards{display:grid;gap:8px}
+.fcard{text-align:left;padding:10px 14px;min-height:46px;border-radius:12px;border:1px dashed var(--line);background:var(--panel2);cursor:pointer;font-size:17px}
+.fcard.sel{border:1px solid var(--ye);background:#ffd16622;color:var(--ye)}
+.fcard.used{display:none}
+.shake{animation:sh .4s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+/* layers */
+.xsec{background:#070b1f;border-radius:14px;border:1px solid var(--line);overflow:hidden}
+.xsec svg{display:block;width:100%;height:auto}
+.lays{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.lay{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:16px}
+.lay i{width:16px;height:16px;border-radius:4px;display:inline-block}
+.lay.sel{border-color:var(--ye);color:var(--ye)}
+.threat{font-size:19px;padding:12px 14px;border-radius:12px;background:#ff6b7a14;border:1px solid #ff6b7a55;margin-bottom:6px}
+.prog{display:flex;gap:6px;margin:8px 0 14px}
+.prog i{flex:1;height:8px;border-radius:4px;background:#26306a}
+.prog i.ok{background:var(--gr)}.prog i.on{background:var(--or)}
+/* mars */
+.mars{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.mars svg{display:block;width:100%;height:auto}
+.bc{cursor:pointer}
+.bc .ring{fill:none;stroke:#5fd4ff;stroke-width:2;animation:rg 1.8s infinite}
+.bc .core{fill:#5fd4ff;stroke:#fff;stroke-width:2}
+.bc.done .core{fill:#6be39b}.bc.done .ring{stroke:#6be39b;animation:none;opacity:.5}
+.bc.cur .core{fill:#ffd166}
+.bc text{fill:#fff;font-size:15px;text-anchor:middle;paint-order:stroke;stroke:#0008;stroke-width:3px;font-family:inherit}
+@keyframes rg{0%{r:12;opacity:1}100%{r:26;opacity:0}}
+.dlist{margin:6px 0 10px;padding-left:20px}
+.dlist li{margin:3px 0}
+.bar{margin:6px 0}
+.bar .lb{font-size:15px;color:var(--dim)}
+.bar .tr{display:grid;grid-template-columns:52px minmax(0,1fr) 92px;align-items:center;gap:8px;font-size:15px;margin:2px 0}
+.bar .tk{height:14px;border-radius:7px;background:#0f1533;position:relative;overflow:hidden}
+.bar .tk i{position:absolute;top:0;bottom:0;border-radius:7px}
+.bar .v{text-align:right;white-space:nowrap}
+/* chamber */
+.chamber{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media(max-width:820px){.chamber{grid-template-columns:minmax(0,1fr)}}
+.cbox{background:linear-gradient(#1a2250,#0c112c);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.cbox svg{display:block;width:100%;height:auto}
+.ctrl{display:grid;gap:12px}
+.ctrl label{display:grid;gap:2px;font-size:16px}
+.ctrl label span.val{color:var(--ye)}
+input[type=range]{width:100%;accent-color:var(--or);height:32px}
+.ctrl .tog,.tog{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.tog input{width:22px;height:22px;accent-color:var(--cy)}
+.gauges{display:grid;gap:6px;margin-top:6px}
+.gauges .g{display:grid;grid-template-columns:110px minmax(0,1fr) 84px;gap:8px;align-items:center;font-size:15px}
+.gauges .g .tk{height:12px;border-radius:6px;background:#0f1533;overflow:hidden}
+.gauges .g .tk i{display:block;height:100%;border-radius:6px;transition:width .3s,background .3s}
+.gauges .g .s{text-align:right;white-space:nowrap}
+.alert{padding:10px 14px;border-radius:12px;background:#ff6b7a1f;border:1px solid var(--rd);color:#ffc0c7;margin:10px 0;display:none}
+.alert.show{display:block;animation:fade .3s}
+/* checklist */
+.chks{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.chk{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:10px 14px;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:17px}
+.chk i{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--dim);margin-top:3px;font-style:normal;display:grid;place-items:center;font-size:14px}
+.chk.on{border-color:var(--cy)}.chk.on i{background:var(--cy);border-color:var(--cy);color:#06122a}
+.chk.good{border-color:var(--gr)}.chk.bad{border-color:var(--rd)}.chk.miss{border-style:dashed;border-color:var(--ye)}
+/* intro */
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+@media(max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}}
+.hero h2{font-size:clamp(34px,5vw,52px);line-height:1.08;text-wrap:balance}
+.hero h2 span{color:var(--or)}
+.story{font-size:19px;color:var(--dim)}
+.story em{font-style:normal;color:var(--ye)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:16px 0}
+.form input{min-height:48px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:#0f1533;font-size:18px}
+.mlist{display:grid;gap:8px;margin-top:14px}
+.mlist div{padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-size:17px}
+/* result */
+#report{background:var(--bg);padding:20px;border-radius:18px;border:1px solid var(--line)}
+.rhead{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;border-bottom:1px dashed var(--line);padding-bottom:14px;margin-bottom:14px}
+.rhead h2{font-size:clamp(32px,5vw,48px);color:var(--ye)}
+.grade{width:120px;height:120px;border-radius:24px;display:grid;place-items:center;font-size:72px;line-height:1;background:linear-gradient(135deg,#ff8a3d,#d9622b);color:#1a0b05;flex:none}
+.verd{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0}
+.verd .card h3{font-size:22px;margin-bottom:6px}
+.pill{display:inline-block;padding:2px 12px;border-radius:999px;font-size:17px}
+.pill.y{background:#6be39b26;color:var(--gr)}.pill.n{background:#ff6b7a26;color:var(--rd)}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--dim);white-space:nowrap}
+td.n{text-align:right;white-space:nowrap}
+.fbtext p{margin:8px 0;font-size:17px}
+.remed{display:grid;gap:8px;margin-top:10px}
+.remed button{justify-content:flex-start;text-align:left}
+.dlbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:#1b2350;border:1px solid var(--cy);color:var(--ink);padding:10px 18px;border-radius:12px;z-index:50;transition:.3s;opacity:0;pointer-events:none;font-size:17px;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+@media(max-width:600px){body{font-size:17px}.brand img{width:40px;height:40px}.hud{order:3;width:100%}table{font-size:14px}.stack thead{display:none}.stack tr{display:grid;padding-block:8px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:7.5em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7em;margin-inline-start:-7.5em;color:var(--dim)}}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="ttl"><h1>MARS SUIT LAB <span>화성 우주복 분석 미션</span></h1><small>생활과 과학 · 의복과 과학 · 첨단 과학의 우주복</small></div>
+  <div class="hud"><span id="hudName">탐사대원 미등록</span><span>미션 에너지 <span class="xp" id="hudXp">0</span></span></div>
+  <div class="brand"><img src="data:image/png;base64,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" alt="EARTH LJY 로고"><div><span>EARTH LJY</span><br>earthljy@ai.jne.kr</div></div>
+</header>
+<nav class="steps" id="steps"></nav>
+<main>
+
+<!-- INTRO -->
+<section class="scr show" id="intro">
+  <div class="hero">
+    <div>
+      <span class="tag">2045년 · 화성 유인 탐사 1호 기지</span>
+      <h2 style="margin:12px 0">착륙까지 남은 시간 72시간, <span>우주복 점검</span>과 <span style="color:var(--cy)">화성 환경 분석</span>을 끝내라!</h2>
+      <p class="story">여러분은 화성 탐사대의 <em>의복 설계 담당 대원</em>입니다. 지금 입고 있는 우주복이 어떤 원리로 우리 몸을 지키는지, 그리고 화성의 환경이 인체와 옷에 어떤 위험을 주는지 정확히 분석해야 화성에 맞는 맞춤 우주복을 설계할 수 있어요.</p>
+      <div class="form">
+        <input id="inId" placeholder="학번 (예: 30215)" inputmode="numeric" autocomplete="off">
+        <input id="inName" placeholder="이름" autocomplete="off">
+      </div>
+      <button class="btn go" id="startBtn">미션 시작</button>
+      <p class="dim" style="font-size:15px;margin-top:8px">각 문항은 처음 선택한 답으로 기록돼요. 찍지 말고 원리를 떠올린 뒤 선택하세요.</p>
+    </div>
+    <div>
+      <div class="mlist">
+        <div><span class="c-o">미션 ①</span> 현재 우주복의 기능 및 원리 분석<br><span class="dim">장치 매칭 → 오개념 진단</span></div>
+        <div><span class="c-c">미션 ②</span> 화성 환경 요인 분석<br><span class="dim">환경 데이터 탐사 → 환경 스트레스 실험 → 핵심 요인 판정</span></div>
+        <div><span class="c-y">최종 점검</span> 객관식 퀴즈 7문항</div>
+        <div><span class="c-g">미션 성공</span> ①·② 충족 여부 판정, A~F 등급, 서술형 피드백, 이미지·PDF 저장</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S11 -->
+<section class="scr" id="s11">
+  <div class="mhead"><span class="tag">미션 ① · 1단계</span><h2>우주복 장치 매칭</h2></div>
+  <div class="brief">오른쪽 <em>기능 카드</em>를 하나 고른 뒤, 왼쪽 우주복에서 그 기능을 맡은 <em>장치의 위치(번호)</em>를 눌러 연결하세요. 6개 장치를 모두 연결하면 다음 단계가 열립니다.</div>
+  <div class="grid2">
+    <div class="suitbox"><svg id="suit" viewBox="0 0 300 430" aria-label="우주복 그림">
+      <defs>
+        <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#d9a21b"/><stop offset="1" stop-color="#7a4f00"/></linearGradient>
+        <linearGradient id="wht" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c3cbe0"/></linearGradient>
+      </defs>
+      <ellipse cx="150" cy="415" rx="90" ry="10" fill="#0006"/>
+      <rect x="76" y="112" width="148" height="152" rx="20" fill="#9fa9c2"/>
+      <rect x="64" y="138" width="34" height="112" rx="16" fill="url(#wht)" transform="rotate(12 81 138)"/>
+      <rect x="202" y="138" width="34" height="112" rx="16" fill="url(#wht)" transform="rotate(-12 219 138)"/>
+      <circle cx="60" cy="250" r="15" fill="#e3e7f1"/><circle cx="240" cy="250" r="15" fill="#e3e7f1"/>
+      <rect x="104" y="252" width="40" height="126" rx="16" fill="url(#wht)"/>
+      <rect x="156" y="252" width="40" height="126" rx="16" fill="url(#wht)"/>
+      <rect x="96" y="128" width="108" height="142" rx="30" fill="url(#wht)"/>
+      <path d="M110 218q40 16 80 0M110 234q40 16 80 0M110 250q40 16 80 0" stroke="#3aa7e0" stroke-width="3" fill="none" opacity=".85"/>
+      <rect x="122" y="158" width="56" height="40" rx="6" fill="#43537f"/>
+      <circle cx="134" cy="170" r="4" fill="#6be39b"/><circle cx="148" cy="170" r="4" fill="#ffd166"/><circle cx="162" cy="170" r="4" fill="#ff6b7a"/>
+      <rect x="130" y="182" width="40" height="8" rx="3" fill="#8fa0cc"/>
+      <path d="M104 160C92 140 84 128 80 120" stroke="#6c7896" stroke-width="5" fill="none"/>
+      <circle cx="104" cy="160" r="9" fill="#9aa7c4" stroke="#334" stroke-width="2"/>
+      <rect x="96" y="372" width="52" height="34" rx="10" fill="#4f5870"/><rect x="152" y="372" width="52" height="34" rx="10" fill="#4f5870"/>
+      <rect x="112" y="120" width="76" height="12" rx="6" fill="#8d97b0"/>
+      <circle cx="150" cy="80" r="50" fill="url(#wht)"/>
+      <ellipse cx="150" cy="84" rx="36" ry="28" fill="url(#gold)"/>
+      <ellipse cx="138" cy="74" rx="10" ry="6" fill="#fff" opacity=".45"/>
+      <g id="hsG"></g>
+    </svg></div>
+    <div>
+      <div class="legend" id="legend"></div>
+      <h3 style="font-size:20px;margin:6px 0">기능 카드</h3>
+      <div class="fcards" id="fcards"></div>
+      <div class="fb" id="s11fb"></div>
+      <button class="btn go next" data-next>다음 단계로</button>
+    </div>
+  </div>
+</section>
+
+<!-- S13 -->
+<section class="scr" id="s13">
+  <div class="mhead"><span class="tag">미션 ① · 2단계</span><h2>오개념 진단 스캔</h2></div>
+  <div class="brief">기능과 원리를 헷갈리거나, "보호한다"처럼 <em>막연한 설명</em>은 설계에 쓸 수 없어요. 가장 과학적으로 정확하고 충분한 분석을 고르세요. (5문항 중 4문항 이상 첫 시도 정답이 기준)</div>
+  <div class="prog" id="s13prog"></div>
+  <div class="card" id="s13box"></div>
+  <button class="btn" id="s13nextQ" style="display:none;margin-top:12px">다음 문항</button>
+  <button class="btn go next" data-next>미션 ② 시작</button>
+</section>
+
+<!-- S21 -->
+<section class="scr" id="s21">
+  <div class="mhead"><span class="tag c">미션 ② · 1단계</span><h2>화성 환경 데이터 탐사</h2></div>
+  <div class="brief">화성 지표의 <em>스캐너 신호 5개</em>를 눌러 환경 데이터를 조회하고, 그 환경이 <em>인체와 의류</em>에 주는 영향을 판단하세요. 5개를 모두 분석해야 다음 단계가 열립니다.</div>
+  <div class="grid2">
+    <div class="mars"><svg id="marsSvg" viewBox="0 0 800 400" aria-label="화성 지표 장면">
+      <defs>
+        <linearGradient id="msky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b1c22"/><stop offset=".55" stop-color="#b8643a"/><stop offset="1" stop-color="#e3a070"/></linearGradient>
+        <linearGradient id="mg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c2552a"/><stop offset="1" stop-color="#7a2d12"/></linearGradient>
+        <linearGradient id="mg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8431d"/><stop offset="1" stop-color="#5a200c"/></linearGradient>
+      </defs>
+      <rect width="800" height="400" fill="url(#msky)"/>
+      <circle cx="680" cy="64" r="13" fill="#fff4dc" opacity=".9"/><circle cx="680" cy="64" r="26" fill="#fff4dc" opacity=".15"/>
+      <path d="M0 230L90 200L170 220L260 180L340 210L430 175L520 205L610 185L700 210L800 190V400H0Z" fill="#8e3a1a" opacity=".7"/>
+      <path d="M0 270Q120 235 230 262T470 255T800 250V400H0Z" fill="url(#mg1)"/>
+      <path d="M0 330Q160 300 330 325T640 318T800 322V400H0Z" fill="url(#mg2)"/>
+      <path d="M520 360h220v40H520z" fill="#cfe8ff" opacity=".18"/>
+      <text x="630" y="388" fill="#d8ecff" font-size="13" text-anchor="middle" opacity=".8">지하 얼음층</text>
+      <g fill="#5a1f0b"><ellipse cx="150" cy="300" rx="22" ry="9"/><ellipse cx="420" cy="345" rx="30" ry="11"/><ellipse cx="700" cy="300" rx="16" ry="7"/></g>
+      <g id="dustG" fill="#f0b98a" opacity=".55"></g>
+      <g id="bcG"></g>
+    </svg></div>
+    <div class="card" id="envPanel"><p class="dim">신호를 눌러 탐사를 시작하세요.</p></div>
+  </div>
+  <button class="btn go next" data-next>다음 단계로</button>
+</section>
+
+<!-- S22 -->
+<section class="scr" id="s22">
+  <div class="mhead"><span class="tag c">미션 ② · 2단계</span><h2>환경 스트레스 실험 챔버</h2></div>
+  <div class="brief">실험 챔버 안의 <em>센서 마네킹</em>은 일반 작업복만 입고 있어요. 지시대로 환경 변수를 화성 수준으로 바꾸고, 나타나는 <em>문제</em>와 그 원인이 되는 <em>핵심 환경 요인</em>을 판별하세요.</div>
+  <div class="prog" id="s22prog"></div>
+  <div class="threat" id="s22goal" style="background:#5fd4ff14;border-color:#5fd4ff55"></div>
+  <div class="chamber">
+    <div class="cbox"><svg id="chSvg" viewBox="0 0 400 360" aria-label="실험 챔버">
+      <rect x="20" y="20" width="360" height="320" rx="20" fill="#0a0f28" stroke="#3a4790" stroke-width="3"/>
+      <g id="dumG" style="transform-origin:200px 200px;transition:transform .4s">
+        <circle cx="200" cy="95" r="30" fill="#c9d0e4"/>
+        <rect x="165" y="128" width="70" height="110" rx="22" fill="#8fa0c8"/>
+        <rect x="138" y="134" width="22" height="90" rx="11" fill="#c9d0e4" transform="rotate(10 149 134)"/>
+        <rect x="240" y="134" width="22" height="90" rx="11" fill="#c9d0e4" transform="rotate(-10 251 134)"/>
+        <rect x="170" y="232" width="26" height="86" rx="12" fill="#c9d0e4"/><rect x="204" y="232" width="26" height="86" rx="12" fill="#c9d0e4"/>
+        <circle cx="190" cy="92" r="3" fill="#334"/><circle cx="210" cy="92" r="3" fill="#334"/>
+      </g>
+      <g id="bubG" fill="none" stroke="#9fe3ff" stroke-width="2" opacity="0"></g>
+      <rect id="frostR" x="20" y="20" width="360" height="320" rx="20" fill="#bfe6ff" opacity="0"/>
+      <g id="radG" stroke="#ffe066" stroke-width="2.5" opacity="0"></g>
+      <g id="dustC" fill="#c98a5a" opacity="0"></g>
+      <text x="200" y="335" fill="#aab3dc" font-size="14" text-anchor="middle">센서 마네킹 (일반 작업복 착용)</text>
+    </svg></div>
+    <div class="card">
+      <div class="ctrl">
+        <label>기압 (지구 = 100%) <span class="val" id="vP">100%</span><input type="range" id="rP" min="0.5" max="100" step="0.5" value="100"></label>
+        <label>온도 <span class="val" id="vT">15℃</span><input type="range" id="rT" min="-143" max="35" step="1" value="15"></label>
+        <label class="tog"><input type="checkbox" id="rM" checked> 지구형 자기장 보호막 켜짐</label>
+        <label>태양풍 세기 <span class="val" id="vS">20%</span><input type="range" id="rS" min="0" max="100" step="5" value="20"></label>
+        <label>모래폭풍·미세먼지(과염소산 포함) <span class="val" id="vD">0%</span><input type="range" id="rD" min="0" max="100" step="5" value="0"></label>
+      </div>
+      <div class="gauges" id="gauges"></div>
+    </div>
+  </div>
+  <div class="alert" id="s22alert"></div>
+  <div class="card" id="s22q" style="display:none;margin-top:12px"></div>
+  <button class="btn" id="s22nextSc" style="display:none;margin-top:12px">다음 실험</button>
+  <button class="btn go next" data-next>다음 단계로</button>
+</section>
+
+<!-- S23 -->
+<section class="scr" id="s23">
+  <div class="mhead"><span class="tag c">미션 ② · 3단계</span><h2>핵심 환경 요인 판정</h2></div>
+  <div class="brief">화성용 맞춤 우주복을 설계할 때 <em>반드시 고려해야 할 화성의 환경 요인</em>을 모두 고르세요. 화성에 해당하지 않는 요인을 고르면 감점됩니다. 첫 제출 결과가 기록돼요.</div>
+  <div class="chks" id="chks"></div>
+  <button class="btn go" id="s23sub" style="margin-top:14px">판정 제출</button>
+  <div class="fb" id="s23fb"></div>
+  <button class="btn go next" data-next>최종 점검 퀴즈로</button>
+</section>
+
+<!-- QUIZ -->
+<section class="scr" id="quiz">
+  <div class="mhead"><span class="tag" style="background:#ffd16622;color:var(--ye)">최종 점검</span><h2>학습 점검 퀴즈</h2></div>
+  <div class="brief">객관식 7문항입니다. 틀리면 피드백을 읽고 다시 고를 수 있지만, <em>첫 시도 결과</em>가 점수에 반영돼요.</div>
+  <div class="prog" id="qprog"></div>
+  <div class="card" id="qbox"></div>
+  <button class="btn" id="qnext" style="display:none;margin-top:12px">다음 문항</button>
+  <button class="btn go next" data-next>미션 결과 보기</button>
+</section>
+
+<!-- RESULT -->
+<section class="scr" id="result">
+  <div id="report"></div>
+  <div class="card" id="remedBox" style="margin-top:16px"></div>
+  <div class="dlbar">
+    <button class="btn go" id="dlPng">결과 이미지 저장 (PNG)</button>
+    <button class="btn go" id="dlPdf">결과 PDF 저장</button>
+    <button class="btn" id="restart">처음부터 다시</button>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const NS='http://www.w3.org/2000/svg';
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ORDER=['intro','s11','s13','s21','s22','s23','quiz','result'];
+const NAMES={intro:'브리핑',s11:'①-1 장치 매칭',s13:'①-2 오개념 진단',s21:'②-1 환경 데이터 탐사',s22:'②-2 환경 스트레스 실험',s23:'②-3 핵심 요인 판정',quiz:'최종 점검 퀴즈',result:'미션 성공'};
+const TOTAL={s11:6,s13:5,s21:5,s22:8,s23:7,quiz:7};
+const S={name:'',sid:'',xp:0,cur:'intro',sc:{},mist:{},time:{},remedDone:{},remediating:false};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const CN=i=>String.fromCharCode(9312+i);
+const pct=id=>S.sc[id]?Math.round(S.sc[id].got/TOTAL[id]*100):0;
+
+function toast(m){const t=$('#toast');t.innerHTML=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
+function award(first){S.xp+=first?10:3;$('#hudXp').textContent=S.xp}
+function addMist(id,txt){(S.mist[id]=S.mist[id]||[]).push(txt)}
+function resetStage(id){S.sc[id]={got:0,done:false};S.mist[id]=[];S.time[id]={start:Date.now()}}
+function drawSteps(){
+  $('#steps').innerHTML=ORDER.map(id=>`<div class="${id===S.cur?'on':(S.sc[id]&&S.sc[id].done?'ok':'')}">${NAMES[id]}</div>`).join('');
+  const on=$('#steps .on'); if(on) on.scrollIntoView({inline:'center',block:'nearest'});
+}
+function go(id){
+  S.cur=id;$$('section.scr').forEach(s=>s.classList.toggle('show',s.id===id));
+  $$('#'+id+' .next').forEach(b=>b.classList.remove('show'));
+  if(INIT[id]) INIT[id]();
+  drawSteps();window.scrollTo({top:0,behavior:RM?'auto':'smooth'});
+}
+function finish(id){
+  S.sc[id].done=true;S.time[id].end=Date.now();
+  const b=$('#'+id+' .next'); if(b){ if(S.remediating){b.textContent='보충 완료 · 결과로 돌아가기';} b.classList.add('show'); }
+  drawSteps();
+}
+$$('[data-next]').forEach(b=>b.addEventListener('click',()=>{
+  const id=S.cur;
+  if(S.remediating){S.remedDone[id]=true;S.remediating=false;go('result');return}
+  go(ORDER[ORDER.indexOf(id)+1]);
+}));
+
+function mcq(box,q,cb,stage){
+  let ord=q.o.map((_,i)=>i);
+  if(!q.fixed&&typeof q.pos==='number'){const rest=ord.filter(i=>i!==q.a);rest.splice(Math.min(q.pos,rest.length),0,q.a);ord=rest}
+  box.innerHTML=`<div class="q">${q.q}</div><div class="opts">${ord.map((i,k)=>`<button class="opt" data-i="${i}">${CN(k)} ${q.o[i]}</button>`).join('')}</div><div class="fb"></div>`;
+  let first=true,done=false;const fb=box.querySelector('.fb');
+  box.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+    if(done)return;const i=+b.dataset.i;
+    if(i===q.a){done=true;b.classList.add('ok');box.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      fb.innerHTML=`<span class="c-g">${first?'정확해요!':'맞았어요.'}</span> ${q.e||''}`;award(first);cb(first);}
+    else{ if(first&&stage) addMist(stage,q.k||q.q); first=false;b.classList.add('no','shake');b.disabled=true;
+      fb.innerHTML=`<span class="c-r">다시 생각해 보세요.</span> ${(q.w&&q.w[i])||q.h||''}`;}
+  }));
+}
+function prog(el,n,done,cur){el.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<done?'ok':(i===cur?'on':'')}"></i>`).join('')}
+
+/* ---------- INTRO ---------- */
+$('#startBtn').addEventListener('click',()=>{
+  const n=$('#inName').value.trim(), id=$('#inId').value.trim();
+  if(!n||!id){toast('<span class="c-y">학번과 이름</span>을 입력해야 탐사대원으로 등록돼요.');return}
+  S.name=n;S.sid=id;$('#hudName').innerHTML=`<span class="c-c">${id} ${n}</span> 대원`;
+  S.time.all={start:Date.now()};go('s11');
+});
+
+/* ---------- S11 ---------- */
+const PARTS=[
+ {id:'helmet',n:'도금 헬멧',x:150,y:44,f:'금으로 도금된 창이 자외선 등 유해 광선을 반사·차단한다'},
+ {id:'pls',n:'주생명유지장치 (등 뒤 배낭)',x:236,y:128,f:'산소를 공급하고 호흡으로 생긴 이산화 탄소를 배출한다'},
+ {id:'reg',n:'산소압조절기',x:86,y:170,f:'공급되는 산소의 압력(양)을 알맞게 조절한다'},
+ {id:'dcm',n:'생명유지시스템조정장치 (가슴 제어판)',x:150,y:178,f:'우주복 내부의 압력·습도·온도를 확인하고 조절한다'},
+ {id:'cool',n:'체온조절장치 (냉각수 순환 내의)',x:150,y:242,f:'몸 가까이에 냉각수를 순환시켜 체온을 일정하게 유지한다'},
+ {id:'boot',n:'장화',x:122,y:389,f:'단열 처리되어 극한 온도의 지면으로부터 발을 보호한다'}];
+let s11sel=null,s11state={};
+function initS11(){
+  resetStage('s11');s11sel=null;s11state={};PARTS.forEach(p=>s11state[p.id]={first:true,done:false});
+  const g=$('#hsG');g.innerHTML='';
+  PARTS.forEach((p,i)=>{const e=document.createElementNS(NS,'g');e.setAttribute('class','hs pulse');e.dataset.id=p.id;e.setAttribute('tabindex','0');e.setAttribute('role','button');e.setAttribute('aria-label',(i+1)+'번 '+p.n);
+    e.innerHTML=`<circle cx="${p.x}" cy="${p.y}" r="14"/><text x="${p.x}" y="${p.y}">${i+1}</text><title>${i+1}. ${p.n}</title>`;
+    e.addEventListener('click',()=>s11hit(p.id));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();s11hit(p.id)}});g.appendChild(e)});
+  drawLegend();
+  $('#fcards').innerHTML=shuffle(PARTS).map(p=>`<button class="fcard" data-id="${p.id}">${p.f}</button>`).join('');
+  $$('#fcards .fcard').forEach(b=>b.addEventListener('click',()=>{s11sel=b.dataset.id;$$('#fcards .fcard').forEach(x=>x.classList.toggle('sel',x===b));$('#s11fb').innerHTML='<span class="c-y">이제 우주복에서 이 기능을 맡은 장치 번호를 누르세요.</span>'}));
+  $('#s11fb').textContent='';
+}
+function drawLegend(){$('#legend').innerHTML=PARTS.map((p,i)=>`<div><b>${i+1}</b><span>${p.n}${s11state[p.id].done?`<br><span class="m">${p.f}</span>`:''}</span></div>`).join('')}
+function s11hit(pid){
+  if(!s11sel){toast('먼저 오른쪽에서 <span class="c-y">기능 카드</span>를 골라 주세요.');return}
+  const st=s11state[s11sel], part=PARTS.find(p=>p.id===pid);
+  if(s11state[pid].done){toast('이미 연결된 장치예요.');return}
+  if(pid===s11sel){st.done=true;if(st.first)S.sc.s11.got++;award(st.first);
+    const h=$(`#hsG .hs[data-id="${pid}"]`);h.classList.remove('pulse');h.classList.add('done');
+    $(`#fcards .fcard[data-id="${pid}"]`).classList.add('used');
+    $('#s11fb').innerHTML=`<span class="c-g">연결 성공!</span> ${part.n} — ${part.f}`;s11sel=null;drawLegend();
+    if(PARTS.every(p=>s11state[p.id].done)){$('#s11fb').innerHTML+=`<br><span class="c-c">모든 장치 연결 완료! 첫 시도 정답 ${S.sc.s11.got}/6</span>`;finish('s11')}
+  }else{
+    if(st.first){st.first=false;const right=PARTS.find(p=>p.id===s11sel);addMist('s11',`‘${right.f}’ 기능을 ${part.n}에 연결함 (정답: ${right.n})`)}
+    $('#s11fb').innerHTML=`<span class="c-r">연결 실패.</span> 그 위치는 <span class="c-o">${part.n}</span>입니다. 고른 기능이 이 장치의 역할인지 다시 생각해 보세요.`;
+    const fc=$(`#fcards .fcard[data-id="${s11sel}"]`);fc.classList.remove('shake');void fc.offsetWidth;fc.classList.add('shake');
+  }
+}
+
+/* ---------- S13 ---------- */
+const Q13=[
+ {q:'<span class="c-o">산소압조절기</span>와 <span class="c-o">생명유지시스템조정장치</span>의 역할을 바르게 구분한 것은?',o:['산소압조절기는 우주복 안의 온도·습도를 조절하고, 생명유지시스템조정장치는 산소를 만든다','산소압조절기는 공급되는 산소의 압력(양)을 조절하고, 생명유지시스템조정장치는 우주복 내부의 압력·습도·온도를 확인하고 조절한다','두 장치 모두 자외선을 차단한다','두 장치 모두 이산화 탄소를 배출하는 같은 장치이다'],a:1,k:'산소압조절기와 생명유지시스템조정장치의 역할 혼동',e:'산소압조절기는 산소 공급 조절에, 생명유지시스템조정장치는 압력·습도·온도 등 우주복 내부 환경 전체의 조절에 초점이 있어요.',w:{0:'두 장치의 역할이 섞였어요. 산소를 "만드는" 장치는 우주복에 없어요. 산소는 주생명유지장치에서 공급돼요.',2:'자외선 차단은 도금 헬멧의 역할이에요.',3:'산소 공급·이산화 탄소 배출은 주생명유지장치의 역할이에요.'}},
+ {q:'헬멧에 대한 분석 중 맞춤 우주복 설계에 활용할 수 있을 만큼 <span class="c-o">가장 충분한</span> 것은?',o:['헬멧은 머리를 보호한다.','헬멧은 우주인을 안전하게 지켜 준다.','금으로 도금된 창이 자외선·적외선 같은 유해 광선을 반사·차단해 눈과 얼굴을 보호하고, 머리를 충격으로부터 지키며 통신 장치가 달려 있다.','헬멧이 금색인 이유는 우주인을 멋있게 보이게 하기 위해서이다.'],a:2,k:'헬멧 분석이 막연함(무엇을, 어떤 원리로 막는지 빠짐)',e:'좋은 분석은 "무엇으로부터" "어떤 구조가" "어떤 원리로" 보호하는지까지 포함해요.',w:{0:'맞는 말이지만 무엇으로부터, 어떤 원리로 보호하는지 빠져 있어 불충분해요.',1:'너무 막연해요. 구체적인 기능과 원리가 없어요.',3:'금 도금은 미적 목적이 아니라 유해 광선 차단을 위한 거예요.'}},
+ {q:'선외 활동용 우주복이 주로 <span class="c-o">흰색</span>인 이유로 가장 적절한 것은?',o:['흰색 염료가 가장 값싸기 때문이다','태양광을 최대한 많이 반사해 온도 조절을 쉽게 하고, 우주 공간에서 우주인을 눈으로 식별하기 쉽게 하기 위해서이다','흰색 섬유가 방사선을 모두 흡수하기 때문이다','흰색이면 우주복 안의 기압이 높아지기 때문이다'],a:1,k:'우주복이 흰색인 이유(태양광 반사·식별)',e:'흰색은 빛을 많이 반사해서 햇빛을 받을 때 온도가 덜 올라가요.',w:{2:'색깔만으로 방사선을 모두 흡수할 수는 없어요.',3:'색과 기압은 관계가 없어요.'}},
+ {q:'대기압이 거의 없는 곳에서 우주복 없이 노출되면 위험한 <span class="c-o">과학적 이유</span>는?',o:['몸이 순식간에 얼어 깨지기 때문이다','혈액과 체액에 녹아 있던 기체가 낮은 압력에서 빠져나와 끓어오르듯 기포가 생기고, 모세혈관이 막히는 등 생명에 지장을 주기 때문이다','중력이 없어 몸이 날아가기 때문이다','산소가 너무 많아 불이 붙기 때문이다'],a:1,k:'저기압이 인체에 위험한 이유(체액 속 기체 탈출)',e:'압력이 낮아지면 기체가 액체에 녹아 있기 어려워져요. 그래서 우주복은 내부를 일정한 압력으로 유지해야 해요.',w:{0:'열은 진공에서 천천히 빠져나가요. "순식간에 언다"는 흔한 오개념이에요.',2:'우주복이 필요한 이유는 중력이 아니라 압력과 산소 때문이에요.',3:'오히려 산소가 없어서 문제예요.'}},
+ {q:'우주복의 장치와 그 <span class="c-o">기능-원리</span>가 바르게 짝지어진 것은?',o:['도금 헬멧 – 산소를 공급한다','주생명유지장치 – 산소를 공급하고 이산화 탄소를 배출한다','체온조절장치 – 자외선을 차단한다','장화 – 우주복 내부의 기압을 조절한다'],a:1,k:'장치와 기능의 짝짓기 혼동',e:'주생명유지장치는 등 뒤 배낭에 있으며 호흡에 필요한 산소를 공급하고 이산화 탄소를 제거해요.',w:{0:'도금 헬멧은 유해 광선을 차단하고 머리를 보호해요.',2:'체온조절장치는 냉각수를 순환시켜 체온을 유지해요. 자외선 차단은 헬멧이에요.',3:'장화는 단열 처리로 발을 보호해요. 내부 압력 조절은 생명유지시스템조정장치예요.'}}];
+let s13i=0;
+function initS13(){resetStage('s13');s13i=0;loadQ13()}
+function loadQ13(){prog($('#s13prog'),Q13.length,s13i,s13i);$('#s13nextQ').style.display='none';
+  mcq($('#s13box'),Q13[s13i],first=>{if(first)S.sc.s13.got++;
+    if(s13i<Q13.length-1)$('#s13nextQ').style.display='';
+    else{prog($('#s13prog'),Q13.length,Q13.length,-1);$('#s13box').insertAdjacentHTML('beforeend',`<p class="c-c">진단 완료! 첫 시도 정답 ${S.sc.s13.got}/5</p>`);finish('s13')}},'s13')}
+$('#s13nextQ').addEventListener('click',()=>{s13i++;loadQ13()});
+
+/* ---------- S21 ---------- */
+const ENV=[
+ {id:'atm',n:'기압·대기',x:140,y:110,
+  data:['기압: 지구의 약 <span class="c-y">1/100</span>','대기의 양: 지구의 약 <span class="c-y">0.75%</span>','성분: <span class="c-o">이산화 탄소 95%</span>, 질소 3%, 아르곤 1.6%, 산소와 수증기는 아주 적음'],
+  bars:[{l:'기압',e:1,m:0.01,el:'1기압',ml:'약 0.01기압'}],
+  q:{q:'이 환경 요인이 인체·의류에 미치는 영향으로 가장 정확한 것은?',o:['기압이 매우 낮아 체액 속 기체가 빠져나오고 숨 쉴 산소도 거의 없어, 우주복 내부를 가압하고 산소를 공급해야 한다','대기가 두꺼워 걸을 때 공기 저항이 크므로 옷을 얇게 만들어야 한다','이산화 탄소가 많아 온실 효과로 지구보다 훨씬 덥다'],a:0,k:'기압·대기 요인의 영향(저기압·산소 부족)',e:'화성 대기는 매우 희박하고 대부분 이산화 탄소라서 가압과 산소 공급이 필수예요.',w:{1:'화성 대기는 지구의 약 0.75%로 매우 희박해요.',2:'이산화 탄소 비율은 높지만 대기 자체가 매우 희박해 온실 효과가 약하고, 평균 기온은 영하 63℃예요.'}}},
+ {id:'temp',n:'온도·태양빛',x:680,y:64,
+  data:['태양과의 거리: 약 <span class="c-y">1.5 AU</span> (지구 1 AU) → 태양빛이 미약함','태양빛 세기: 거리의 제곱에 반비례하므로 지구의 약 <span class="c-y">0.44배</span>','평균 기온 약 <span class="c-c">-63℃</span>, 최고 약 35℃, 최저 약 -143℃ ~ -176℃','대기가 희박해 열을 붙잡지 못하므로 <span class="c-o">온도 변화가 극심함</span>'],
+  bars:[{l:'태양빛 세기',e:1,m:0.44,el:'1',ml:'약 0.44'}],range:{l:'기온 범위(℃)',min:-180,max:60,e:[-89,57],m:[-143,35]},
+  q:{q:'이 환경 요인이 인체·의류에 미치는 영향으로 가장 정확한 것은?',o:['평균 기온이 매우 낮고 온도 변화가 극심해 동상·저체온 위험이 크고 소재가 굳거나 손상될 수 있어, 단열과 능동적인 온도 조절이 필요하다','태양에서 멀어 자외선이 전혀 없으므로 헬멧 창이 필요 없다','항상 영하이므로 냉각 장치는 전혀 필요 없다'],a:0,k:'온도·태양빛 요인의 영향(극저온·큰 온도차)',e:'바깥이 차가워도 활동 중에는 몸에서 열이 나므로, 단열과 함께 냉각·가열을 조절하는 장치가 모두 필요해요.',w:{1:'태양빛이 약해도 대기가 희박해 자외선은 지표까지 강하게 도달해요.',2:'최고 기온은 35℃까지 오르고, 활동 중 몸에서 나는 열도 빼내야 해요.'}}},
+ {id:'rad',n:'자기장·방사선',x:420,y:58,
+  data:['화성은 지구처럼 행성 전체를 감싸는 강한 자기장이 없음 (<span class="c-y">미약한 자기장</span>)','두꺼운 대기도 없어 <span class="c-o">태양풍</span>의 고에너지 입자와 우주 방사선이 지표까지 도달'],
+  bars:[{l:'자기장 보호',e:1,m:0.03,el:'강함',ml:'매우 약함'}],
+  q:{q:'이 환경 요인이 인체·의류에 미치는 영향으로 가장 정확한 것은?',o:['방사선 노출로 세포와 DNA가 손상되어 암 등의 위험이 커지므로, 방사선을 차폐하는 소재와 구조가 필요하다','자기장이 약해 나침반이 안 되는 것 외에는 인체에 영향이 없다','자기장이 약하면 몸이 가벼워져 넘어지기 쉽다'],a:0,k:'자기장·방사선 요인의 영향(방사선 피폭)',e:'지구는 자기장과 두꺼운 대기가 고에너지 입자를 막아 주지만, 화성에서는 우주복이 그 역할을 일부 대신해야 해요.',w:{1:'자기장이 약하면 태양풍의 고에너지 입자가 그대로 쏟아져 인체에 위험해요.',2:'몸무게는 중력과 관계가 있어요. 자기장과는 관계없어요.'}}},
+ {id:'dust',n:'표면·먼지',x:250,y:300,
+  data:['표면: <span class="c-o">산화 철</span>이 많은 붉은 고체 표면','토양에 독성 물질인 <span class="c-r">과염소산(염)</span> 포함','먼지 입자가 지구보다 <span class="c-y">훨씬 미세함</span>','주기적으로 거대한 <span class="c-y">모래폭풍</span> 발생'],
+  bars:[],
+  q:{q:'이 환경 요인이 인체·의류에 미치는 영향으로 가장 정확한 것은?',o:['미세한 먼지가 관절·지퍼 등의 틈새로 들어가 마모와 고장을 일으키고, 과염소산 독성 물질이 피부·호흡기에 닿을 수 있어 밀봉과 먼지 차단이 필요하다','먼지는 입자가 커서 털어 내기만 하면 되므로 큰 문제가 없다','모래폭풍은 바람이 강해서 우주인을 날려 보내는 것이 가장 큰 위험이다'],a:0,k:'표면·먼지 요인의 영향(미세먼지 침투·과염소산 독성)',e:'화성 먼지는 아주 미세해 틈새로 스며들고, 기지 안으로 옮겨지면 독성 물질에 노출될 수 있어요.',w:{1:'화성 먼지는 지구보다 훨씬 미세해 잘 털리지 않고 틈새로 스며들어요.',2:'대기가 희박해 바람이 미는 힘은 약해요. 먼지가 시야를 가리고 장비에 스며드는 것이 더 큰 문제예요.'}}},
+ {id:'grav',n:'중력·물',x:610,y:300,
+  data:['중력: 지구의 약 <span class="c-y">0.38배</span>','지하와 극지방에 거대한 <span class="c-c">얼음층</span>이 존재'],
+  bars:[{l:'중력',e:1,m:0.38,el:'1',ml:'0.38'}],
+  q:{q:'이 환경 요인이 인체·의류에 미치는 영향으로 가장 정확한 것은?',o:['중력이 약해 걷는 방식과 균형 잡기가 달라지고 오래 머물면 근육·뼈가 약해질 수 있어, 관절이 자유롭게 움직이고 보행이 안정적인 설계가 필요하다','중력이 0이므로 몸이 둥둥 떠다닌다','중력이 지구보다 커서 무거운 우주복을 입을 수 없다'],a:0,k:'중력·물 요인의 영향(저중력 보행·활동성)',e:'달(약 0.17배)보다는 강하지만 지구보다 약한 중력이라, 걷기·점프·넘어짐에 맞는 활동성이 중요해요.',w:{1:'화성의 중력은 0이 아니라 지구의 약 0.38배예요.',2:'화성의 중력은 지구보다 약해요.'}}}];
+let s21state={},s21cur=null,dustTimer=null;
+function initS21(){
+  resetStage('s21');s21state={};ENV.forEach(e=>s21state[e.id]={first:true,done:false});s21cur=null;
+  const g=$('#bcG');g.innerHTML='';
+  ENV.forEach(e=>{const b=document.createElementNS(NS,'g');b.setAttribute('class','bc');b.dataset.id=e.id;b.setAttribute('tabindex','0');b.setAttribute('role','button');b.setAttribute('aria-label',e.n+' 신호');
+    const ly=e.y>200?e.y+34:e.y+36;
+    b.innerHTML=`<circle cx="${e.x}" cy="${e.y}" r="24" fill="transparent"/><circle class="ring" cx="${e.x}" cy="${e.y}" r="12"/><circle class="core" cx="${e.x}" cy="${e.y}" r="11"/><text x="${e.x}" y="${ly}">${e.n}</text>`;
+    b.addEventListener('click',()=>openEnv(e.id));b.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openEnv(e.id)}});g.appendChild(b)});
+  $('#envPanel').innerHTML='<p class="dim">화성 지표의 <span class="c-c">파란 신호</span>를 눌러 탐사를 시작하세요. (분석 완료 0/5)</p>';
+  const dg=$('#dustG');dg.innerHTML=Array.from({length:40},()=>`<circle cx="${Math.random()*800}" cy="${150+Math.random()*240}" r="${Math.random()*2+0.6}"/>`).join('');
+  if(!RM){clearInterval(dustTimer);dustTimer=setInterval(()=>{if(S.cur!=='s21')return;$$('#dustG circle').forEach(c=>{let x=+c.getAttribute('cx')+1.2;if(x>800)x=0;c.setAttribute('cx',x)})},60)}
+}
+function barHTML(b){const mx=Math.max(b.e,b.m);return `<div class="bar"><div class="lb">${b.l}</div>
+  <div class="tr"><span>지구</span><span class="tk"><i style="left:0;width:${b.e/mx*100}%;background:var(--cy)"></i></span><span class="v">${b.el}</span></div>
+  <div class="tr"><span>화성</span><span class="tk"><i style="left:0;width:${Math.max(2,b.m/mx*100)}%;background:var(--mars)"></i></span><span class="v">${b.ml}</span></div></div>`}
+function rangeHTML(r){const sp=r.max-r.min,f=v=>(v-r.min)/sp*100;return `<div class="bar"><div class="lb">${r.l} · 왼쪽 ${r.min}℃ ~ 오른쪽 ${r.max}℃</div>
+  <div class="tr"><span>지구</span><span class="tk"><i style="left:${f(r.e[0])}%;width:${f(r.e[1])-f(r.e[0])}%;background:var(--cy)"></i></span><span class="v">${r.e[0]}~${r.e[1]}℃</span></div>
+  <div class="tr"><span>화성</span><span class="tk"><i style="left:${f(r.m[0])}%;width:${f(r.m[1])-f(r.m[0])}%;background:var(--mars)"></i></span><span class="v">${r.m[0]}~${r.m[1]}℃</span></div></div>`}
+function openEnv(id){
+  const e=ENV.find(x=>x.id===id);s21cur=id;$$('#bcG .bc').forEach(b=>b.classList.toggle('cur',b.dataset.id===id));
+  const done=s21state[id].done;
+  $('#envPanel').innerHTML=`<h3 style="font-size:24px" class="c-c">${e.n} 데이터</h3><ul class="dlist">${e.data.map(d=>`<li>${d}</li>`).join('')}</ul>${e.bars.map(barHTML).join('')}${e.range?rangeHTML(e.range):''}
+   <div id="envQ" style="margin-top:12px"></div>`;
+  if(done){$('#envQ').innerHTML=`<p class="c-g">분석 완료: ${e.q.o[e.q.a]}</p>`;return}
+  mcq($('#envQ'),e.q,first=>{s21state[id].done=true;if(first)S.sc.s21.got++;
+    $(`#bcG .bc[data-id="${id}"]`).classList.add('done');
+    const n=ENV.filter(x=>s21state[x.id].done).length;
+    $('#envQ').insertAdjacentHTML('beforeend',`<p class="c-c">분석 완료 ${n}/5${n<5?' · 다른 신호도 조사하세요.':''}</p>`);
+    if(n===5){$('#envQ').insertAdjacentHTML('beforeend',`<p class="c-g">화성 환경 탐사 완료! 첫 시도 정답 ${S.sc.s21.got}/5</p>`);finish('s21')}
+  },'s21');
+}
+
+/* ---------- S22 ---------- */
+const FACT=['기압·대기','온도·태양빛','자기장·방사선','표면·먼지(독성)','중력·물'];
+const SC22=[
+ {goal:'기압 슬라이더를 화성 수준(지구의 <span class="c-y">1% 이하</span>)으로 낮추세요.',cond:s=>s.p<=1,alert:'체액 상태 경고! 마네킹 내부 센서에서 기포가 발생하고 몸이 부풀고 있습니다. 호흡 가능 산소 0%.',
+  q1:{q:'센서 마네킹에서 관찰된 문제를 가장 정확하게 설명한 것은?',o:['낮은 기압 때문에 체액 속 기체가 빠져나와 몸이 부풀고(팽창), 산소가 없어 호흡이 불가능해진다','몸이 얼어서 단단하게 굳는다','피부에 독성 물질이 묻어 염증이 생긴다'],a:0,k:'저기압 문제 식별(팽창·호흡 곤란)',e:'약 0.063기압(암스트롱 한계) 아래에서는 체온(약 37℃)에서도 체액이 끓기 시작해요.'},
+  q2:{q:'이 문제를 일으킨 핵심 환경 요인은?',fixed:true,o:FACT,a:0,k:'저기압 문제의 환경 요인 분류',e:'기압·대기 요인 → 우주복 내부 가압과 압력 조절, 산소 공급 장치가 필요해요.'}},
+ {goal:'온도 슬라이더를 화성의 밤 기온 수준(<span class="c-y">-100℃ 이하</span>)으로 낮추세요.',cond:s=>s.t<=-100,alert:'체온 경고! 마네킹 표면 온도가 급격히 떨어지고 일반 작업복 섬유가 딱딱하게 굳고 있습니다.',
+  q1:{q:'센서 마네킹에서 관찰된 문제를 가장 정확하게 설명한 것은?',o:['극저온과 큰 온도 차로 동상·저체온 위험이 생기고, 소재가 굳어 갈라지거나 움직이기 어려워진다','방사선 때문에 세포가 손상된다','기압이 높아져 몸이 눌린다'],a:0,k:'극저온·온도차 문제 식별',e:'화성은 평균 -63℃, 밤에는 -100℃ 아래로 떨어져요. 단열층과 온도 조절 장치가 필요해요.'},
+  q2:{q:'이 문제를 일으킨 핵심 환경 요인은?',fixed:true,o:FACT,a:1,k:'극저온 문제의 환경 요인 분류',e:'온도·태양빛 요인 → 단열과 체온조절장치처럼 온도를 조절하는 기능이 필요해요.'}},
+ {goal:'<span class="c-y">자기장 보호막을 끄고</span>, 태양풍 세기를 <span class="c-y">80% 이상</span>으로 올리세요.',cond:s=>!s.m&&s.s>=80,alert:'피폭 경고! 고에너지 입자가 마네킹을 관통하고 있습니다. 누적 피폭량 급상승.',
+  q1:{q:'센서 마네킹에서 관찰된 문제를 가장 정확하게 설명한 것은?',o:['고에너지 입자(방사선)에 노출되어 세포와 DNA가 손상되고 암 등의 위험이 커진다','강한 바람에 몸이 날아간다','먼지가 관절에 끼어 움직이기 어렵다'],a:0,k:'방사선 노출 문제 식별',e:'자기장이 미약한 화성에서는 태양풍과 우주 방사선을 막을 차폐 설계가 필요해요.'},
+  q2:{q:'이 문제를 일으킨 핵심 환경 요인은?',fixed:true,o:FACT,a:2,k:'방사선 문제의 환경 요인 분류',e:'자기장·방사선 요인 → 방사선 차폐 소재, 방사선 경보 센서 등이 필요해요.'}},
+ {goal:'모래폭풍·미세먼지 세기를 <span class="c-y">70% 이상</span>으로 올리세요.',cond:s=>s.d>=70,alert:'오염 경고! 미세먼지가 작업복의 솔기와 관절 틈으로 스며들고, 과염소산 성분이 피부 센서에서 검출되었습니다.',
+  q1:{q:'센서 마네킹에서 관찰된 문제를 가장 정확하게 설명한 것은?',o:['미세먼지가 틈새로 침투해 관절·장비를 마모시키고, 독성 과염소산이 피부와 호흡기에 닿을 위험이 있다','기압이 낮아져 체액이 끓는다','체온이 지나치게 올라간다'],a:0,k:'미세먼지·과염소산 문제 식별',e:'먼지 차단 밀봉, 잘 묻지 않는 겉감, 기지 출입 시 오염 차단(외부 거치형 출입) 등이 필요해요.'},
+  q2:{q:'이 문제를 일으킨 핵심 환경 요인은?',fixed:true,o:FACT,a:3,k:'미세먼지 문제의 환경 요인 분류',e:'표면·먼지(독성) 요인 → 밀봉 구조와 먼지 차단 소재가 필요해요.'}}];
+let s22i=0,s22st={},s22trig=false,radTimer=null;
+const EARTH={p:100,t:15,m:true,s:20,d:0};
+function initS22(){resetStage('s22');s22i=0;loadSc22();
+  $('#radG').innerHTML=Array.from({length:14},(_,i)=>`<line x1="${40+i*25}" y1="25" x2="${20+i*25}" y2="80"/>`).join('');
+  $('#dustC').innerHTML=Array.from({length:70},()=>`<circle cx="${30+Math.random()*340}" cy="${30+Math.random()*300}" r="${Math.random()*2.5+1}"/>`).join('');
+  $('#bubG').innerHTML=Array.from({length:10},(_,i)=>`<circle cx="${172+(i*13)%60}" cy="${150+(i*23)%90}" r="${3+i%3}"/>`).join('');
+  if(!RM){clearInterval(radTimer);radTimer=setInterval(()=>{if(S.cur!=='s22')return;$$('#radG line').forEach(l=>{let y=+l.getAttribute('y1')+14;if(y>300)y=25;l.setAttribute('y1',y);l.setAttribute('y2',y+55)})},70)}
+}
+function loadSc22(){
+  s22st={...EARTH};s22trig=false;
+  $('#rP').value=100;$('#rT').value=15;$('#rM').checked=true;$('#rS').value=20;$('#rD').value=0;
+  prog($('#s22prog'),SC22.length,s22i,s22i);
+  $('#s22goal').innerHTML=`<span class="c-c">실험 ${s22i+1}/${SC22.length}</span> · ${SC22[s22i].goal}`;
+  $('#s22alert').classList.remove('show');$('#s22q').style.display='none';$('#s22nextSc').style.display='none';
+  $$('.ctrl input').forEach(i=>i.disabled=false);renderCh();
+}
+function readCh(){s22st={p:+$('#rP').value,t:+$('#rT').value,m:$('#rM').checked,s:+$('#rS').value,d:+$('#rD').value};renderCh();
+  const sc=SC22[s22i];if(!s22trig&&sc.cond(s22st)){s22trig=true;triggerSc22()}}
+['#rP','#rT','#rM','#rS','#rD'].forEach(id=>$(id).addEventListener('input',readCh));
+function renderCh(){
+  const s=s22st;
+  $('#vP').textContent=s.p+'%';$('#vT').textContent=s.t+'℃';$('#vS').textContent=s.s+'%';$('#vD').textContent=s.d+'%';
+  const sw=s.p<30?1+(30-s.p)/30*0.14:1;$('#dumG').style.transform=`scale(${sw})`;
+  $('#bubG').setAttribute('opacity',s.p<6.3?1:0);
+  $('#frostR').setAttribute('opacity',s.t<-20?Math.min(.5,(-s.t-20)/123*.5):0);
+  const rad=(s.m?0.12:1)*s.s/100;$('#radG').setAttribute('opacity',rad);
+  $('#dustC').setAttribute('opacity',s.d/100*.9);
+  const G=[
+   ['체액·호흡',s.p>=50?100:Math.max(3,s.p/50*100),s.p<6.3?'체액 끓음':s.p<50?'위험':'정상'],
+   ['체온 안전도',s.t>=0?100:Math.max(3,100+s.t/1.43),s.t<-100?'동상 위험':s.t<0?'주의':'정상'],
+   ['방사선 안전도',Math.max(3,100-rad*100),rad>.6?'피폭 위험':rad>.3?'주의':'정상'],
+   ['먼지·독성 안전도',Math.max(3,100-s.d),s.d>=70?'오염 위험':s.d>30?'주의':'정상']];
+  $('#gauges').innerHTML=G.map(g=>{const c=g[1]>60?'var(--gr)':g[1]>30?'var(--ye)':'var(--rd)';return `<div class="g"><span>${g[0]}</span><span class="tk"><i style="width:${g[1]}%;background:${c}"></i></span><span class="s" style="color:${c}">${g[2]}</span></div>`}).join('');
+}
+function triggerSc22(){
+  const sc=SC22[s22i];$('#s22alert').innerHTML=sc.alert;$('#s22alert').classList.add('show');
+  $$('.ctrl input').forEach(i=>i.disabled=true);
+  const box=$('#s22q');box.style.display='block';
+  mcq(box,sc.q1,f1=>{if(f1)S.sc.s22.got++;
+    setTimeout(()=>{mcq(box,sc.q2,f2=>{if(f2)S.sc.s22.got++;
+      if(s22i<SC22.length-1)$('#s22nextSc').style.display='';
+      else{prog($('#s22prog'),SC22.length,SC22.length,-1);box.insertAdjacentHTML('beforeend',`<p class="c-c">모든 환경 스트레스 실험 완료! 첫 시도 정답 ${S.sc.s22.got}/8</p>`);finish('s22')}
+    },'s22')},900);
+  },'s22');
+}
+$('#s22nextSc').addEventListener('click',()=>{s22i++;loadSc22()});
+
+/* ---------- S23 ---------- */
+const CHK=[
+ {t:'매우 낮은 기압 (지구의 약 1/100)',ok:1,e:'가압·팽창 억제가 필요해요.'},
+ {t:'이산화 탄소 위주의 희박한 대기 (산소 부족)',ok:1,e:'산소 공급·이산화 탄소 제거가 필요해요.'},
+ {t:'극저온과 극심한 온도 변화',ok:1,e:'단열과 온도 조절이 필요해요.'},
+ {t:'미약한 자기장으로 인한 태양풍·방사선',ok:1,e:'방사선 차폐가 필요해요.'},
+ {t:'지구보다 훨씬 미세한 먼지와 주기적 모래폭풍',ok:1,e:'밀봉과 먼지 차단이 필요해요.'},
+ {t:'토양 속 독성 물질(과염소산)',ok:1,e:'독성 물질 접촉·반입을 막아야 해요.'},
+ {t:'지구의 약 0.38배인 낮은 중력',ok:1,e:'보행·활동성 설계가 필요해요.'},
+ {t:'강한 자기장으로 인한 전자 장비 고장',ok:0,e:'화성의 자기장은 미약해요.'},
+ {t:'두꺼운 대기로 인한 높은 대기압',ok:0,e:'화성 대기는 지구의 약 0.75%로 매우 희박해요.'},
+ {t:'표면을 덮은 액체 바다로 인한 침수',ok:0,e:'화성의 물은 주로 지하·극지방의 얼음으로 존재해요.'},
+ {t:'태양과 가까워 계속되는 고온',ok:0,e:'화성은 태양에서 약 1.5 AU 떨어져 있어 평균 기온이 -63℃예요.'}];
+let s23order=[],s23sel=new Set(),s23sub=false,s23rec={hit:0,wrong:0,missed:0};
+function initS23(){resetStage('s23');s23order=shuffle(CHK.map((_,i)=>i));s23sel=new Set();s23sub=false;s23rec={hit:0,wrong:0,missed:0};S.sc.s23.rec=s23rec;drawChk();$('#s23fb').textContent='';$('#s23sub').textContent='판정 제출';$('#s23sub').disabled=false}
+function drawChk(mark){
+  $('#chks').innerHTML=s23order.map(i=>{const c=CHK[i],on=s23sel.has(i);let cls=on?'on':'';
+    if(mark){if(on&&c.ok)cls+=' good';else if(on&&!c.ok)cls+=' bad';else if(!on&&c.ok)cls+=' miss'}
+    return `<button class="chk ${cls}" data-i="${i}"><i>${on?'✓':''}</i><span>${c.t}${mark&&((on&&!c.ok)||(!on&&c.ok))?`<br><span class="${c.ok?'c-y':'c-r'}" style="font-size:15px">${c.ok?'빠뜨림: ':'화성 아님: '}${c.e}</span>`:''}</span></button>`}).join('');
+  $$('#chks .chk').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;s23sel.has(i)?s23sel.delete(i):s23sel.add(i);drawChk(false)}));
+}
+$('#s23sub').addEventListener('click',()=>{
+  let hit=0,wrong=0,missed=0;CHK.forEach((c,i)=>{const on=s23sel.has(i);if(c.ok&&on)hit++;if(!c.ok&&on)wrong++;if(c.ok&&!on)missed++});
+  if(!s23sub){s23sub=true;s23rec.hit=hit;s23rec.wrong=wrong;s23rec.missed=missed;S.sc.s23.got=Math.max(0,hit-wrong);award(wrong===0&&missed===0);
+    CHK.forEach((c,i)=>{const on=s23sel.has(i);if(c.ok&&!on)addMist('s23','빠뜨린 요인: '+c.t);if(!c.ok&&on)addMist('s23','화성에 해당하지 않는 요인 선택: '+c.t)})}
+  drawChk(true);
+  if(wrong===0&&missed===0){$('#s23fb').innerHTML=`<span class="c-g">완벽한 판정!</span> 화성의 핵심 환경 요인 7가지를 누락 없이 골랐어요. (첫 제출 기록: 맞힌 요인 ${s23rec.hit}/7, 잘못 고른 요인 ${s23rec.wrong}개)`;$('#s23sub').disabled=true;finish('s23')}
+  else{$('#s23fb').innerHTML=`<span class="c-r">아직 정확하지 않아요.</span> 빠뜨린 요인 ${missed}개, 화성이 아닌 요인 ${wrong}개. 표시된 설명을 읽고 고친 뒤 다시 제출하세요. <span class="dim">(점수는 첫 제출 기준)</span>`;$('#s23sub').textContent='수정하여 다시 확인'}
+});
+
+/* ---------- QUIZ ---------- */
+const QZ=[
+ {q:'등 뒤 배낭 형태의 <span class="c-o">주생명유지장치</span>의 핵심 기능은?',o:['자외선을 차단한다','산소를 공급하고 이산화 탄소를 배출한다','냉각수를 순환시켜 체온을 유지한다','단열 처리로 발을 보호한다'],a:1,k:'주생명유지장치의 기능',e:'주생명유지장치는 호흡에 필요한 산소를 공급하고 이산화 탄소를 제거해요.',w:{0:'자외선 차단은 금 도금 헬멧의 역할이에요.',2:'냉각수 순환은 체온조절장치의 역할이에요.',3:'발 보호는 장화의 역할이에요.'}},
+ {q:'헬멧 앞 창을 <span class="c-o">금으로 도금</span>하는 이유는?',o:['무게를 줄이기 위해','자외선·적외선 등 유해 광선과 열을 반사·차단하기 위해','통신 전파를 강하게 하기 위해','김 서림을 막기 위해'],a:1,k:'헬멧 금 도금의 원리',e:'얇은 금 막은 빛과 열을 잘 반사해 눈과 얼굴을 보호해요.'},
+ {q:'화성 대기의 <span class="c-c">가장 많은 성분</span>과 그 특징으로 옳은 것은?',o:['질소 – 지구 대기와 거의 같다','산소 – 그대로 호흡할 수 있다','이산화 탄소(약 95%) – 대기가 매우 희박하고 산소가 거의 없다','아르곤 – 대기가 매우 두껍다'],a:2,k:'화성 대기 성분',e:'화성 대기는 이산화 탄소 95%, 질소 3%, 아르곤 1.6%이고 양은 지구의 약 0.75%예요.'},
+ {q:'지구에서 우주복을 포함한 무게가 <span class="c-y">1000 N</span>인 우주인이 화성(중력 지구의 0.38배)에 서면 무게는?',o:['380 N','620 N','1000 N','2630 N'],a:0,k:'화성 중력 적용 계산',e:'무게 = 질량 × 중력 가속도이므로 1000 N × 0.38 = 380 N. 질량은 변하지 않아요.',w:{1:'1000 − 380을 계산했어요. 0.38배이므로 곱해야 해요.',2:'질량은 같아도 무게는 중력에 따라 달라져요.',3:'나누기를 했어요. 화성 중력이 더 약하므로 무게는 줄어요.'}},
+ {q:'화성 표면에서 <span class="c-c">방사선 위험</span>이 지구보다 큰 까닭은?',o:['화성이 태양에 더 가깝기 때문에','자기장이 미약하고 대기가 희박해 태양풍·우주 방사선이 지표까지 도달하기 때문에','화성 토양이 스스로 방사선을 많이 내기 때문에','중력이 약하기 때문에'],a:1,k:'화성 방사선 위험의 원인',e:'지구는 자기장과 두꺼운 대기가 보호막 역할을 하지만 화성은 그렇지 못해요.',w:{0:'화성은 지구보다 태양에서 더 멀어요(약 1.5 AU).'}},
+ {q:'화성의 <span class="c-c">미세먼지와 과염소산</span>에 대응하기 위한 우주복 설계로 가장 적절한 것은?',o:['통기성을 높이려 겉감에 구멍을 낸다','관절·지퍼 등 틈새를 밀봉하고 먼지가 잘 묻지 않는 겉감을 쓰며, 기지 출입 시 오염을 차단한다','두께를 줄여 가볍게 만든다','흰색 대신 검은색으로 만든다'],a:1,k:'미세먼지·독성 대응 설계',e:'틈새 침투와 독성 물질 반입을 막는 것이 핵심이에요.'},
+ {q:'화성의 <span class="c-c">극저온과 큰 온도 변화</span>에 대응하는 우주복 기능 조합으로 가장 적절한 것은?',o:['바깥 열 출입을 막는 단열 처리 + 체온조절장치·생명유지시스템조정장치로 능동적인 온도 조절','산소압조절기만 강화','헬멧 금 도금만 두껍게','장화를 없애 가볍게 만들기'],a:0,k:'온도 변화 대응 기능 조합',e:'바깥 열을 막는 단열과 우주복 안의 온도를 조절하는 장치가 함께 있어야 해요.'}];
+let qi=0;
+function initQuiz(){resetStage('quiz');qi=0;loadQ()}
+function loadQ(){prog($('#qprog'),QZ.length,qi,qi);$('#qnext').style.display='none';
+  mcq($('#qbox'),QZ[qi],first=>{if(first)S.sc.quiz.got++;
+    if(qi<QZ.length-1)$('#qnext').style.display='';
+    else{prog($('#qprog'),QZ.length,QZ.length,-1);$('#qbox').insertAdjacentHTML('beforeend',`<p class="c-c">퀴즈 완료! 첫 시도 정답 ${S.sc.quiz.got}/7</p>`);finish('quiz')}},'quiz')}
+$('#qnext').addEventListener('click',()=>{qi++;loadQ()});
+
+/* ---------- RESULT ---------- */
+function evalAll(){
+  const g=id=>(S.sc[id]?S.sc[id].got:0);
+  const m1=Math.round((g('s11')+g('s13'))/11*100);
+  const m2=Math.round((g('s21')+g('s22')+g('s23'))/20*100);
+  const qz=pct('quiz');
+  const rec=(S.sc.s23&&S.sc.s23.rec)||{hit:0,wrong:9,missed:9};
+  const c1=m1>=80&&g('s13')>=4;
+  const c2=m2>=80&&rec.wrong===0&&rec.missed<=1;
+  const tot=Math.round(m1*.4+m2*.4+qz*.2);
+  let gr=tot>=90?'A':tot>=80?'B':tot>=70?'C':tot>=60?'D':'F';
+  if(!(c1&&c2)&&(gr==='A'||gr==='B'))gr='C';
+  if(!c1&&!c2&&gr==='C')gr='D';
+  return {m1,m2,qz,c1,c2,tot,gr,rec};
+}
+const fmtT=id=>{const t=S.time[id];if(!t||!t.end)return '-';const s=Math.round((t.end-t.start)/1000);return `${Math.floor(s/60)}분 ${s%60}초`};
+function initResult(){
+  const R=evalAll(),d=new Date();
+  S.time.all.end=S.time.all.end||Date.now();
+  const rows=['s11','s13','s21','s22','s23','quiz'];
+  const mistList=id=>(S.mist[id]||[]).length?`<span class="c-r">${S.mist[id].join(' / ')}</span>`:'<span class="c-g">첫 시도 오답 없음</span>';
+  const p1=R.c1?`<p><span class="c-o">항목 ① 현재 우주복의 기능 및 원리 분석</span>은 <span class="c-g">충족</span>입니다. ${S.name} 대원은 주생명유지장치·산소압조절기·생명유지시스템조정장치·체온조절장치·도금 헬멧·장화의 위치와 기능을 정확히 연결했고, 각 장치가 <span class="c-c">왜</span> 필요한지(저기압·산소 부족·온도 변화·유해 광선 등)까지 짚어 냈습니다(정확도 ${R.m1}%). ${pct('s13')<100?'다만 오개념 진단에서 놓친 부분('+(S.mist.s13||[]).join(', ')+')은 설계 단계에서 한 번 더 확인해 두세요.':'오개념 진단도 모두 통과해 기능과 원리를 혼동하지 않았습니다.'}</p>`
+   :`<p><span class="c-o">항목 ① 현재 우주복의 기능 및 원리 분석</span>은 <span class="c-r">미충족</span>입니다(정확도 ${R.m1}%, 오개념 진단 ${S.sc.s13?S.sc.s13.got:0}/5). ${pct('s11')<80?'장치의 위치와 기능 연결이 아직 불안정합니다. ':''}${(S.sc.s13&&S.sc.s13.got<4)?'특히 오개념 진단에서 기능과 원리를 혼동하거나 막연한 설명을 고른 경우가 있었습니다. ':''}채점 기준에 따르면 내용이 단순하거나 불충분하면 충족으로 보지 않으므로, "어떤 장치가 · 무엇으로부터 · 어떤 원리로" 지키는지 세 가지를 모두 말할 수 있도록 보충해 보세요.</p>`;
+  const p2=R.c2?`<p><span class="c-c">항목 ② 화성 환경 요인 분석</span>은 <span class="c-g">충족</span>입니다. 기압·대기 성분, 온도 범위와 태양빛, 미약한 자기장과 태양풍(방사선), 미세먼지·모래폭풍과 과염소산 독성, 0.38배 중력까지 주요 요인을 파악하고 그것이 인체와 의류에 주는 위험을 연결했습니다(정확도 ${R.m2}%, 핵심 요인 판정 ${R.rec.hit}/7, 오선택 ${R.rec.wrong}개). 이 분석은 다음 단계인 맞춤 우주복 도식화의 근거가 됩니다.</p>`
+   :`<p><span class="c-c">항목 ② 화성 환경 요인 분석</span>은 <span class="c-r">미충족</span>입니다(정확도 ${R.m2}%, 핵심 요인 판정 첫 제출 ${R.rec.hit}/7, 오선택 ${R.rec.wrong}개). ${pct('s21')<80?'환경 데이터를 보고 인체·의류에 미치는 영향을 판단하는 과정에서 실수가 있었습니다. ':''}${pct('s22')<80?'환경 변화로 생기는 문제를 식별하고 원인 요인으로 분류하는 연습이 더 필요합니다. ':''}${(R.rec.missed>1||R.rec.wrong>0)?'핵심 요인 판정에서 빠뜨리거나 화성에 해당하지 않는 요인을 골랐습니다. ':''}수치를 확인하는 데서 그치지 말고 "이 환경 때문에 몸과 옷에 무슨 일이 생기는가"까지 연결해 보세요.</p>`;
+  const p3=`<p><span class="c-y">최종 점검 퀴즈</span>는 첫 시도 ${S.sc.quiz?S.sc.quiz.got:0}/7(${R.qz}%)입니다. ${R.qz>=80?'개념이 잘 정리되어 있어요.':'틀린 문항의 피드백을 다시 읽고 관련 단계의 시뮬레이션을 보충해 보세요.'} 전체 수행 시간은 ${(()=>{const s=Math.round((S.time.all.end-S.time.all.start)/1000);return Math.floor(s/60)+'분 '+s%60+'초'})()}이며, ${R.gr==='A'?'모든 과정을 정확하고 충실하게 수행한 우수한 탐사였습니다.':R.gr==='B'?'두 항목을 모두 충족한 성실한 탐사였습니다. 약간의 실수만 보완하면 A 등급이에요.':'아래 보충 미션으로 부족한 단계만 다시 수행하면 등급을 올릴 수 있습니다.'}</p>`;
+  $('#report').innerHTML=`
+   <div class="rhead"><div><span class="tag">MISSION COMPLETE</span><h2 style="margin-top:8px">미션 성공!</h2>
+     <div class="dim">${S.sid} ${S.name} 대원 · ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} · 종합 점수 <span class="c-y">${R.tot}점</span></div></div>
+     <div style="display:flex;align-items:center;gap:14px"><div class="grade">${R.gr}</div>
+     <div style="display:flex;align-items:center;gap:8px"><img src="${$('.brand img').src}" alt="" style="width:56px;height:56px;border-radius:50%;background:#fff;padding:2px"><div style="font-size:13px;color:var(--dim)"><span class="c-c">EARTH LJY</span><br>earthljy@ai.jne.kr</div></div></div></div>
+   <div class="verd">
+     <div class="card"><h3>① 현재 우주복의 기능 및 원리 분석</h3><span class="pill ${R.c1?'y':'n'}">${R.c1?'충족 (O)':'미충족 (X)'}</span><p class="dim" style="font-size:15px;margin:8px 0 0">기준: 정확도 80% 이상 + 오개념 진단 4/5 이상<br>결과: 정확도 <span class="c-y">${R.m1}%</span>, 오개념 진단 <span class="c-y">${S.sc.s13?S.sc.s13.got:0}/5</span></p></div>
+     <div class="card"><h3>② 화성 환경 요인 분석</h3><span class="pill ${R.c2?'y':'n'}">${R.c2?'충족 (O)':'미충족 (X)'}</span><p class="dim" style="font-size:15px;margin:8px 0 0">기준: 정확도 80% 이상 + 핵심 요인 누락 1개 이하·오선택 0개<br>결과: 정확도 <span class="c-y">${R.m2}%</span>, 누락 <span class="c-y">${R.rec.missed}</span>개, 오선택 <span class="c-y">${R.rec.wrong}</span>개</p></div>
+   </div>
+   <h3 style="font-size:22px;margin:14px 0 6px">단계별 수행 과정</h3>
+   <table class="stack"><thead><tr><th>단계</th><th>첫 시도 정답</th><th>정확도</th><th>소요 시간</th><th>첫 시도에서 틀린 내용</th></tr></thead><tbody>
+   ${rows.map(id=>`<tr><td>${NAMES[id]}${S.remedDone[id]?' <span class="c-g">(보충)</span>':''}</td><td class="n">${S.sc[id]?S.sc[id].got:0}/${TOTAL[id]}</td><td class="n" style="color:${pct(id)>=80?'var(--gr)':'var(--rd)'}">${pct(id)}%</td><td class="n">${fmtT(id)}</td><td style="font-size:14px">${mistList(id)}</td></tr>`).join('')}
+   </tbody></table>
+   <h3 style="font-size:22px;margin:16px 0 4px">수행 과정 피드백</h3>
+   <div class="fbtext">${p1}${p2}${p3}</div>
+   <p class="dim" style="font-size:14px">등급 기준: 종합 점수 = ①정확도×0.4 + ②정확도×0.4 + 퀴즈×0.2 → A 90점 이상, B 80점 이상(A·B는 ①·② 모두 충족 필요), C 70점 이상, D 60점 이상, F 60점 미만</p>`;
+  // remediation
+  const need=[];
+  if(pct('s11')<80)need.push(['s11','장치의 위치와 기능 연결이 부족해요.']);
+  if(S.sc.s13&&S.sc.s13.got<4)need.push(['s13','기능·원리 오개념을 바로잡아야 해요.']);
+  else if(pct('s13')<80)need.push(['s13','오개념 진단 정확도를 높여 보세요.']);
+  if(pct('s21')<80)need.push(['s21','환경 데이터와 인체·의류 영향 연결이 부족해요.']);
+  if(pct('s22')<80)need.push(['s22','환경 문제 식별과 요인 분류가 부족해요.']);
+  if(R.rec.missed>1||R.rec.wrong>0||pct('s23')<80)need.push(['s23','핵심 환경 요인을 누락 없이 골라야 해요.']);
+  if(R.qz<80)need.push(['quiz','개념 점검 퀴즈 정확도가 낮아요.']);
+  $('#remedBox').innerHTML=need.length?`<h3 style="font-size:22px">등급 올리기 · 보충 미션</h3><p class="dim">부족했던 단계만 다시 수행하면 됩니다. 보충한 단계는 새 기록으로 바뀌고, 끝나면 이 화면으로 돌아와요.</p><div class="remed">${need.map(n=>`<button class="btn" data-r="${n[0]}"><span class="c-o">${NAMES[n[0]]}</span>&nbsp;· ${n[1]}</button>`).join('')}</div>`
+   :`<h3 style="font-size:22px" class="c-g">보충할 단계가 없어요!</h3><p class="dim">모든 단계를 기준 이상으로 수행했습니다. 이 분석을 바탕으로 맞춤 우주복 도식화(③~⑤ 항목)로 넘어가세요.</p>`;
+  $$('#remedBox [data-r]').forEach(b=>b.addEventListener('click',()=>{S.remediating=true;go(b.dataset.r)}));
+  S.sc.result={got:0,done:true};drawSteps();
+}
+
+/* downloads */
+let DL=null;const dlP=(window.claude&&typeof window.claude.use==='function')?window.claude.use('downloads').then(d=>{DL=d;return d}).catch(()=>null):Promise.resolve(null);
+async function offer(name,data){
+  const dl=DL||await Promise.race([dlP,new Promise(r=>setTimeout(()=>r(null),1500))]);
+  if(dl){try{await dl.save({filename:name,data});toast('<span class="c-g">저장했어요.</span>')}catch(e){toast(e&&e.code==='declined'?'저장을 취소했어요.':'이 화면에서는 저장할 수 없어요.')}return}
+  const blob=data instanceof Blob?data:new Blob([data]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+}
+async function snap(){
+  if(!window.html2canvas){toast('이미지 변환 도구를 불러오지 못했어요.');return null}
+  toast('결과 화면을 이미지로 만드는 중…');
+  return html2canvas($('#report'),{backgroundColor:'#0b1026',scale:2,useCORS:true});
+}
+const fname=ext=>`화성우주복미션_${S.sid}_${S.name}.${ext}`;
+$('#dlPng').addEventListener('click',async()=>{const c=await snap();if(!c)return;c.toBlob(b=>offer(fname('png'),b),'image/png')});
+$('#dlPdf').addEventListener('click',async()=>{
+  const c=await snap();if(!c)return;if(!window.jspdf){toast('PDF 도구를 불러오지 못했어요.');return}
+  const pdf=new window.jspdf.jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  const W=210,H=297,m=8,iw=W-m*2,ih=c.height*iw/c.width,img=c.toDataURL('image/jpeg',0.92);
+  let y=0;pdf.setFillColor(11,16,38);
+  while(y<ih){pdf.rect(0,0,W,H,'F');pdf.addImage(img,'JPEG',m,m-y,iw,ih);y+=H-m*2;if(y<ih)pdf.addPage()}
+  offer(fname('pdf'),pdf.output('blob'));
+});
+$('#restart').addEventListener('click',()=>{if(S._confirm){location.hash='';location.reload();return}S._confirm=true;toast('기록이 모두 지워져요. 한 번 더 누르면 처음부터 시작합니다.');setTimeout(()=>S._confirm=false,3000)});
+
+const PAT=[2,0,3,1,1,3,2,0];
+function spread(list,off){list.forEach((q,i)=>{if(!q.fixed)q.pos=PAT[(i+off)%PAT.length]%q.o.length})}
+spread(Q13,0);spread(ENV.map(e=>e.q),3);spread(SC22.map(c=>c.q1),3);spread(QZ,1);
+const INIT={s11:initS11,s13:initS13,s21:initS21,s22:initS22,s23:initS23,quiz:initQuiz,result:initResult};
+drawSteps();
+}
+</script>
+</body>
+</html>
